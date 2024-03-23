@@ -26,7 +26,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/products", productRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
