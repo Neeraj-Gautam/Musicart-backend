@@ -51,7 +51,16 @@ router.get("/", async (req, res) => {
     }
 
     if (company) {
-      filter.brand = { $regex: company, $options: "i" };
+      if (search) {
+        filter.brand = {
+          $or: [
+            { $regex: company, $options: "i" },
+            { $regex: search, $options: "i" },
+          ],
+        };
+      } else {
+        filter.brand = { $regex: company, $options: "i" };
+      }
     }
 
     if (color) {
@@ -59,7 +68,7 @@ router.get("/", async (req, res) => {
     }
 
     if (search) {
-      filter.search = { $regex: color, $options: "i" };
+      filter.modelName = { $regex: search, $options: "i" };
     }
 
     if (price) {
