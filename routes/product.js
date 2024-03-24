@@ -35,11 +35,14 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    console.log( req.query)
+    console.log(req.query);
     const headPhoneType = req.query.headPhoneType || "";
-    const color = req.query.color || "";
     const company = req.query.company || "";
+    const color = req.query.color || "";
     const price = req.query.price || "";
+    const sortBy = req.query.sortBy || "";
+    const sortType = req.query.sortType || "";
+    const search = req.query.search || "";
 
     let filter = {};
 
@@ -47,26 +50,71 @@ router.get("/", async (req, res) => {
       filter.headPhoneType = { $regex: headPhoneType, $options: "i" };
     }
 
+    if (company) {
+      filter.brand = { $regex: company, $options: "i" };
+    }
+
     if (color) {
       filter.color = { $regex: color, $options: "i" };
     }
 
-    if (company) {
-      filter.color = { $regex: company, $options: "i" };
+    if (search) {
+      filter.search = { $regex: color, $options: "i" };
     }
 
     if (price) {
       const minPrice = price.split("-")[0];
       const maxPrice = price.split("-")[1];
+      console.log(minPrice, maxPrice);
+      filter.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+    }
+    console.log(sortBy, sortType);
+    let products = await Product.find(filter);
+    if (sortBy && sortType) {
+      switch (sortBy) {
+        case "price":
+          {
+            if (sortType === "asc") {
+              products.sort((a, b) => {
+                return a[sortBy] - b[sortBy];
+              });
+            } else if (sortType === "desc") {
+              products.sort((a, b) => {
+                return b[sortBy] - a[sortBy];
+              });
+            }
+          }
 
-      filter.price = { $gte: parseInt(minPrice) };
-      filter.price = { $lte: parseInt(maxPrice) };
+          break;
+
+        case "name":
+          {
+            if (sortType === "asc") {
+              products.sort((a, b) => {
+                const name1 = (a.brand + a.modelName).toLowerCase();
+                const name2 = (b.brand + b.modelName).toLowerCase();
+                if (name1 < name2) return -1;
+                if (name1 > name2) return 1;
+                return 0;
+              });
+            } else if (sortType === "desc") {
+              products.sort((a, b) => {
+                const name1 = (a.brand + a.modelName).toLowerCase();
+                const name2 = (b.brand + b.modelName).toLowerCase();
+                if (name1 < name2) return 1;
+                if (name1 > name2) return -1;
+                return 0;
+              });
+            }
+          }
+
+          break;
+      }
     }
 
-    let products = await Product.find(filter);
+    console.log(products);
     res.send(products);
   } catch (error) {}
 });
 
 module.exports = router;
-
