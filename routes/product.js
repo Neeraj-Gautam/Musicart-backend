@@ -3,6 +3,14 @@ const router = express.Router();
 const Product = require("../models/product");
 const { v4: uuidv4 } = require("uuid");
 
+router.get("/:uuid", async (req, res) => {
+  try {
+    const uuid = req.params.uuid;
+    let item = await Product.findOne({ uuid: uuid });
+    res.json({ item });
+  } catch (error) {}
+});
+
 router.post("/", async (req, res) => {
   try {
     const newProduct = new Product({
@@ -77,7 +85,6 @@ router.get("/", async (req, res) => {
       console.log(minPrice, maxPrice);
       filter.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
     }
-    console.log(sortBy, sortType);
     let products = await Product.find(filter);
     if (sortBy && sortType) {
       switch (sortBy) {
@@ -121,7 +128,6 @@ router.get("/", async (req, res) => {
       }
     }
 
-    console.log(products);
     res.send(products);
   } catch (error) {}
 });

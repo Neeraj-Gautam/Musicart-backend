@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/product");
+const cartRoutes = require("./routes/cart");
+const checkoutRoutes = require("./routes/checkout");
 
 const app = express();
 
@@ -27,6 +29,8 @@ app.get("/health", (req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/cart", cartRoutes);
+app.use("/api/v1/checkout", checkoutRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

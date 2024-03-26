@@ -47,7 +47,7 @@ router.post("/register", async (req, res) => {
     const userResponse = await userData.save();
 
     const token = await jwt.sign(
-      { userId: userResponse._id },
+      { userId: userResponse.email },
       process.env.JWT_SECRET
     );
 
@@ -91,7 +91,7 @@ router.post("/login", async (req, res) => {
     }
 
     const token = await jwt.sign(
-      { userId: userDetails._id },
+      { userId: userDetails.email },
       process.env.JWT_SECRET
     );
 
@@ -99,6 +99,7 @@ router.post("/login", async (req, res) => {
       message: "User logged in successfully",
       token: token,
       name: userDetails.name,
+      cart: userDetails.cart,
       success: true,
     });
   } catch (error) {
