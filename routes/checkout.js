@@ -2,13 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/product");
 const Cart = require("../models/cart");
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
 
 router.get("/:token", async (req, res) => {
   try {
     const token = req.params.token;
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedToken = authController.verifyToken(token);
     const cart = await Cart.findOne({ userId: decodedToken.userId });
 
     let productMap = new Map();

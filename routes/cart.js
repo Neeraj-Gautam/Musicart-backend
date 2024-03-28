@@ -3,63 +3,58 @@ const router = express.Router();
 const Product = require("../models/product");
 const Cart = require("../models/cart");
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
+const authController = require("../controller/auth");
 
 router.get("/:token", async (req, res) => {
   try {
     const token = req.params.token;
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const cart = await Cart.findOne({userId: decodedToken.userId});
+    const decodedToken = authController.verifyToken(token);
+    const cart = await Cart.findOne({ userId: decodedToken.userId });
     return res.json(cart);
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 });
 
-
-
 router.post("/add/product/:uuid/", async (req, res) => {
   try {
     const uuid = req.params.uuid;
-    const { token } = req.body;
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const { token, quantity } = req.body;
+    const decodedToken = authController.verifyToken(token);
     const email = decodedToken.userId;
 
     const userDetails = await User.findOne({ email: email });
 
-    if(!userDetails) {
-
+    if (!userDetails) {
     }
 
     const product = await Product.findOne({ uuid: uuid });
 
-    if(!product) {
-      
+    if (!product) {
     }
-    let cart = await Cart.findOne({userId: email});
+    let cart = await Cart.findOne({ userId: email });
 
-    if(!cart) {
+    if (!cart) {
       cart = new Cart({
         userId: email,
-        products: []
+        products: [],
       });
     }
-
-
 
     for (let i = 0; i < cart.products.length; i++) {
       let cartItem = cart.products[i];
       if (cartItem.productId === uuid) {
-
-        if(cartItem.quantity == 8) {
-          return res.json(cart);
+        if (quantity) {
+          cartItem.quantity = quantity;
+        } else {
+          cartItem.quantity++;
         }
 
-        cartItem.quantity++;
+        if (cartItem.quantity > 8) cartItem.quantity = 8;
 
-         await Cart.updateOne(
-          {userId: cart.userId,},
-          { $set: { products: cart.products },}
+        await Cart.updateOne(
+          { userId: cart.userId },
+          { $set: { products: cart.products } }
         );
 
         return res.json(cart);
