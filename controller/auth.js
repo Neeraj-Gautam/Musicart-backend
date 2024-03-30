@@ -18,10 +18,6 @@ const generateUserToken = (email) => {
   return token;
 };
 
-const verifyToken = (token) => {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    return decodedToken;
-}
 
 const registerUser = async (req, res) => {
   try {
@@ -119,4 +115,4 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, verifyToken };
+module.exports = { registerUser, loginUser };

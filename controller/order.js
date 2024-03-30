@@ -3,13 +3,13 @@ const Cart = require("../models/cart");
 const User = require("../models/user");
 const Order = require("../models/order");
 const cartController = require("../controller/cart");
+const authController = require("../controller/auth");
 const jwt = require("jsonwebtoken");
 
 const placeOrder = async (req, res) => {
   try {
-    const { token, address, deliveryCharge } = req.body;
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decodedToken.userId;
+    const { address, deliveryCharge } = req.body;
+    const userId = req.userId;
 
     const userDetails = await User.findOne({ email: userId });
     if (!userDetails) {
@@ -23,16 +23,19 @@ const placeOrder = async (req, res) => {
 
     const cartProducts = await cartController.getProductsInfoFromCart(cart);
     let totalItemPrice = 0;
-    for(let i=0;i<cartProducts.length; i++) {
-        totalItemPrice += (cartProducts[i].product.price * cartProducts[i].quantity);
+    for (let i = 0; i < cartProducts.length; i++) {
+      totalItemPrice +=
+        cartProducts[i].product.price * cartProducts[i].quantity;
     }
 
-
     const orderData = new Order({
-      email: userDetails.email,
+      userId: userDetails.email,
       name: userDetails.name,
       address: address,
-      products: cart.products.map(product => ({ productId: product.productId, quantity: product.quantity})),
+      products: cart.products.map((product) => ({
+        productId: product.productId,
+        quantity: product.quantity,
+      })),
       totalItemPrice: totalItemPrice,
       deliveryCharge: deliveryCharge,
       createdAt: new Date(),
@@ -53,4 +56,16 @@ const placeOrder = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder };
+const getAllOrdersForUser = async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.userId });
+    res.json(orders); 
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error occurred while getting orders" });
+  }
+};
+
+module.exports = { placeOrder, getAllOrdersForUser };
