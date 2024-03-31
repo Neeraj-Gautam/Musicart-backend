@@ -5,7 +5,7 @@ const getProduct = async (req, res) => {
   try {
     const productId = req.params.productId;
     const product = await Product.findOne({ uuid: productId });
-    res.json({ product });
+    res.json(product);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error while getting product" });
@@ -59,16 +59,7 @@ const getAllProducts = async (req, res) => {
     }
 
     if (company) {
-      if (search) {
-        filter.brand = {
-          $or: [
-            { $regex: company, $options: "i" },
-            { $regex: search, $options: "i" },
-          ],
-        };
-      } else {
-        filter.brand = { $regex: company, $options: "i" };
-      }
+      filter.brand = { $regex: company, $options: "i" };
     }
 
     if (color) {
@@ -76,7 +67,10 @@ const getAllProducts = async (req, res) => {
     }
 
     if (search) {
-      filter.modelName = { $regex: search, $options: "i" };
+      filter.$or = [
+        { modelName: { $regex: search, $options: "i" } }, 
+        { brand: { $regex: search, $options: "i" } } 
+      ];
     }
 
     if (price) {

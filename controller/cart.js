@@ -45,18 +45,17 @@ const getCartDetails = async (req, res) => {
 const addProductInCart = async (req, res) => {
   try {
     const productId = req.params.productId;
-    const { token, quantity } = req.body;
-    const decodedToken = authController.verifyToken(token);
-    const email = decodedToken.userId;
+    const { quantity } = req.body;
+    const email = req.userId;
 
     const userDetails = await User.findOne({ email: email });
-
     if (!userDetails) {
+      return res.status(409).json({ message: "User does not exists" });
     }
 
     const product = await Product.findOne({ uuid: productId });
-
     if (!product) {
+      return res.status(409).json({ message: "Product does not exists" });
     }
     let cart = await Cart.findOne({ userId: email });
 
@@ -101,4 +100,4 @@ const addProductInCart = async (req, res) => {
   }
 };
 
-module.exports = { getProductsInfoFromCart, addProductInCart, getCartDetails};
+module.exports = { getProductsInfoFromCart, addProductInCart, getCartDetails };
