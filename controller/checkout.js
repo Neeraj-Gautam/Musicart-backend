@@ -14,7 +14,7 @@ const checkout = async (req, res) => {
     }
     const productIds = [...productMap.keys()];
     const products = await Product.find({
-      uuid: { $in: productIds },
+      productId: { $in: productIds },
     });
 
     let data = [];
@@ -23,7 +23,7 @@ const checkout = async (req, res) => {
       console.log(products[i]);
       data.push({
         product: products[i],
-        quantity: productMap.get(products[i].uuid),
+        quantity: productMap.get(products[i].productId),
       });
     }
     return res.json(data);

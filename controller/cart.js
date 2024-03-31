@@ -14,7 +14,7 @@ const getProductsInfoFromCart = async (cart) => {
     }
 
     const products = await Product.find({
-      uuid: { $in: [...productIdToQuantityMap.keys()] },
+      productId: { $in: [...productIdToQuantityMap.keys()] },
     });
 
     let data = [];
@@ -23,7 +23,7 @@ const getProductsInfoFromCart = async (cart) => {
       console.log(products[i]);
       data.push({
         product: products[i],
-        quantity: productIdToQuantityMap.get(products[i].uuid),
+        quantity: productIdToQuantityMap.get(products[i].productId),
       });
     }
 
@@ -53,7 +53,7 @@ const addProductInCart = async (req, res) => {
       return res.status(409).json({ message: "User does not exists" });
     }
 
-    const product = await Product.findOne({ uuid: productId });
+    const product = await Product.findOne({ productId: productId });
     if (!product) {
       return res.status(409).json({ message: "Product does not exists" });
     }
@@ -87,7 +87,7 @@ const addProductInCart = async (req, res) => {
     }
 
     const newCartproduct = {
-      productId: product.uuid,
+      productId: product.productId,
       quantity: 1,
     };
 

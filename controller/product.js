@@ -4,43 +4,13 @@ const Product = require("../models/product");
 const getProduct = async (req, res) => {
   try {
     const productId = req.params.productId;
-    const product = await Product.findOne({ uuid: productId });
+    const product = await Product.findOne({ productId: productId });
     res.json(product);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error while getting product" });
   }
 };
-
-// router.post("/", async (req, res) => {
-//   try {
-//     const newProduct = new Product({
-//       uuid: uuidv4(),
-//       brand: req.body.brand,
-//       modelName: req.body.modelName,
-//       fullName: req.body.fullName,
-//       stars: req.body.stars,
-//       about: req.body.about,
-//       price: req.body.price,
-//       color: req.body.color,
-//       headPhoneType: req.body.headPhoneType,
-//       imageUrl: req.body.imageUrl,
-//     });
-//     console.log(newProduct);
-//     await newProduct.save();
-//     console.log("Saved");
-//     res.json({
-//       success: true,
-//       message: "Product saved successfully",
-//     });
-//   } catch (error) {
-//     console.error("Failed to save product", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to save product",
-//     });
-//   }
-// });
 
 const getAllProducts = async (req, res) => {
   try {
