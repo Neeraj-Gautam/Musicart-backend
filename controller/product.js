@@ -46,7 +46,6 @@ const getAllProducts = async (req, res) => {
     if (price) {
       const minPrice = price.split("-")[0];
       const maxPrice = price.split("-")[1];
-      console.log(minPrice, maxPrice);
       filter.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
     }
     let products = await Product.find(filter);

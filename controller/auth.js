@@ -25,7 +25,7 @@ const registerUser = async (req, res) => {
 
     if (!name || !mobile || !email || !password) {
       return res.status(400).json({
-        errorMessage: "Bad Request",
+        message: "Bad Request",
       });
     }
 
@@ -44,7 +44,7 @@ const registerUser = async (req, res) => {
 
     if (!isValidMobileNumber(mobile)) {
       return res.status(400).json({
-        errorMessage: "Invalid mobile number format",
+        message: "Invalid mobile number format",
       });
     }
 
@@ -81,7 +81,7 @@ const loginUser = async (req, res) => {
 
     if (!userIdentifier || !password) {
       return res.status(400).json({
-        errorMessage: "Bad Request! Invalid credentials",
+        message: "Bad Request! Invalid credentials",
       });
     }
 
@@ -93,7 +93,7 @@ const loginUser = async (req, res) => {
     }
 
     if (!userDetails) {
-      return res.status(401).json({ errorMessage: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const passwordMatch = await bcrypt.compare(password, userDetails.password);
@@ -101,11 +101,11 @@ const loginUser = async (req, res) => {
     if (!passwordMatch) {
       return res
         .status(401)
-        .json({ errorMessage: "Invalid credentials", success: false });
+        .json({ message: "Invalid credentials", success: false });
     }
 
     const token = generateUserToken(userDetails.email);
-    res.json({
+    res.status(201).json({
       message: "User logged in successfully",
       token: token,
       name: userDetails.name,

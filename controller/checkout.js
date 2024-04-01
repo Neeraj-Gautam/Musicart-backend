@@ -6,7 +6,6 @@ const checkout = async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.userId });
     let productMap = new Map();
-    console.log(cart.products);
 
     for (let i = 0; i < cart.products.length; i++) {
       const cartItem = cart.products[i];
@@ -20,7 +19,6 @@ const checkout = async (req, res) => {
     let data = [];
 
     for (let i = 0; i < products.length; i++) {
-      console.log(products[i]);
       data.push({
         product: products[i],
         quantity: productMap.get(products[i].productId),

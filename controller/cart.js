@@ -2,7 +2,6 @@ const express = require("express");
 const Product = require("../models/product");
 const Cart = require("../models/cart");
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
 
 const getProductsInfoFromCart = async (cart) => {
   try {
@@ -20,7 +19,6 @@ const getProductsInfoFromCart = async (cart) => {
     let data = [];
 
     for (let i = 0; i < products.length; i++) {
-      console.log(products[i]);
       data.push({
         product: products[i],
         quantity: productIdToQuantityMap.get(products[i].productId),
@@ -75,7 +73,13 @@ const addProductInCart = async (req, res) => {
           cartItem.quantity++;
         }
 
-        if (cartItem.quantity > 8) cartItem.quantity = 8;
+        if (cartItem.quantity > 8) {
+          cartItem.quantity = 8;
+          res.status(204).json({
+            message: "Maximum quantity (8) reached for this product",
+          });
+          return;
+        }
 
         await Cart.updateOne(
           { userId: cart.userId },

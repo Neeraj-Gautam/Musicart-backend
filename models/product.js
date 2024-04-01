@@ -32,6 +32,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  noOfCustomerReviews: {
+    type: Number,
+    required: true,
+  },
   color: {
     type: String,
     required: true,
@@ -42,7 +46,7 @@ const productSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    // required: true,
+    required: true,
   },
   sideViewImages: [
     {

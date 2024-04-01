@@ -3,12 +3,11 @@ const Cart = require("../models/cart");
 const User = require("../models/user");
 const Order = require("../models/order");
 const cartController = require("../controller/cart");
-const authController = require("../controller/auth");
-const jwt = require("jsonwebtoken");
+const Product = require("../models/product");
 
 const placeOrder = async (req, res) => {
   try {
-    const { address, deliveryCharge } = req.body;
+    const { address, deliveryCharge, paymentMethod } = req.body;
     const userId = req.userId;
 
     const userDetails = await User.findOne({ email: userId });
@@ -38,6 +37,7 @@ const placeOrder = async (req, res) => {
       })),
       totalItemPrice: totalItemPrice,
       deliveryCharge: deliveryCharge,
+      paymentMethod: paymentMethod,
       createdAt: new Date(),
     });
 
@@ -59,7 +59,7 @@ const placeOrder = async (req, res) => {
 const getAllOrdersForUser = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.userId });
-    res.json(orders); 
+    res.json(orders);
   } catch (error) {
     console.log(error);
     return res
@@ -68,4 +68,35 @@ const getAllOrdersForUser = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, getAllOrdersForUser };
+const getOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    let order = await Order.findOne({ _id: orderId });
+    order = order.toObject();
+    let productMap = new Map();
+    for (let i = 0; i < order.products.length; i++) {
+      productMap.set(order.products[i].productId, null);
+    }
+    const productIds = [...productMap.keys()];
+    const products = await Product.find({
+      productId: { $in: productIds },
+    });
+    for (let i = 0; i < products.length; i++) {
+      const {productId , brand, modelName, price, color, imageUrl} = products[i];
+      productMap.set(products[i].productId, {productId , brand, modelName, price, color, imageUrl});
+    }
+
+   
+
+    for (let i = 0; i < order.products.length; i++) {
+      order.products[i].product = productMap.get(order.products[i].productId);
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error while getting product" });
+  }
+};
+
+module.exports = { placeOrder, getAllOrdersForUser, getOrder };

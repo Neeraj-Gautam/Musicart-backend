@@ -21,9 +21,7 @@ router.post("/", async (req, res) => {
       imageUrl: req.body.imageUrl,
       sideViewImages: req.body.sideViewImages
     });
-    console.log(newProduct);
     await newProduct.save();
-    console.log("Saved");
     res.json({
       success: true,
       message: "Product saved successfully",
